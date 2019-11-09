@@ -1,0 +1,105 @@
+import { observable } from 'mobx'
+import ITMP from 'itmpws'
+
+
+class Core {
+  constructor() {
+    this.connections = new Map()
+    this.states = observable.map()
+  }
+
+  getter = (url) => {
+    try {
+      return this.states.get(url)
+    } catch (e) {
+      return undefined
+    }
+
+  }
+  setter = (url, value) => {
+    try {
+      return this.states.set(url, value)
+    } catch (e) {
+      return undefined
+    }
+
+  }
+  connect(hostport) {
+    let itmp = this.connections.get(hostport) // try to get connection
+    if (!itmp) {
+      console.log('connect new', hostport)
+      itmp = new ITMP({
+        uri: "ws://" + hostport + "/ws/",
+        binaryType: 'arraybuffer',
+        reconnectTimeout: 3000,
+        autoReconnect: true,
+        reconnectMaxCount: 0,
+        onOpen: () => { },
+        onClose: () => { },
+        onError: () => { },
+        onReconnect: () => { }
+      })
+      itmp.connect()
+      this.connections.set(hostport, itmp)
+    }
+
+    return itmp
+  }
+
+  subscribe(url, opts) {
+    if (!url.startsWith('itmpws://')) {
+      console.error('subscribe unknown schema', url)
+      throw new Error('unknown schema')
+    }
+    const parts = this.splitUrl(url)
+    let itmp = this.connect(parts[0])
+    this.states.set(url, undefined)
+    console.log('subscribe', url, '=', parts[0], '->', parts[1])
+
+    return itmp.subscribeOnce(parts[1], (exttopic, value) => {
+      this.states.set(url, value)
+    }, opts).then((res) => {
+      console.log('subscribed')
+    })
+  }
+
+  unsubscribe = (url) => {
+    console.log('UNsubscribe', url)
+    if (!url.startsWith('itmpws://'))
+      throw new Error('unknown schema')
+    const parts = this.splitUrl(url)
+    let itmp = this.connect(parts[0])
+    return itmp.unsubscribeOnce(parts[1])
+  }
+
+  call = (url, args) => {
+    console.log('call', url, args)
+    const parts = this.splitUrl(url)
+    let itmp = this.connect(parts[0])
+    console.log(itmp)
+    return itmp.call(parts[1], args)
+  }
+  emit = (url, value) => {
+    console.log('emit', url, value)
+    const parts = this.splitUrl(url)
+    let itmp = this.connect(parts[0])
+    //    if (parts[1]) parts[1] += '/'
+
+    return itmp.emit(parts[1], value)
+  }
+  splitUrl = (url) => {
+    //const parts = url.slice(9).split('/', 2)
+    let parts
+    let sep = url.slice(9).indexOf('/');
+    if (sep >= 0) {
+      parts = [url.substr(9, sep), url.substr(9 + 1 + sep)]
+    } else {
+      parts = [url.substr(9), '']
+    }
+    //console.log('url splitted', url, '->', url.slice(9), '->', JSON.stringify(parts))
+    if (!parts[1]) parts[1] = ''
+    return parts
+  }
+}
+
+export default new Core()

@@ -1,0 +1,23 @@
+{
+  "name": "itmpreact",
+  "version": "1.0.0",
+  "description": "itmp mobx react storage",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/neolp/itmpreact.git"
+  },
+  "author": "Alexei Tsigulin",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/neolp/itmpreact/issues"
+  },
+  "homepage": "https://github.com/neolp/itmpreact#readme",
+  "dependencies": {
+    "itmpws": "^1.2.2",
+    "mobx": "^5.15.0"
+  }
+}
