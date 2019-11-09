@@ -1,6 +1,6 @@
 {
   "name": "itmpreact",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "itmp mobx react storage",
   "main": "index.js",
   "scripts": {
