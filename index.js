@@ -6,8 +6,22 @@ class Core {
   constructor() {
     this.connections = new Map()
     this.states = observable.map()
+    this.intstates = observable.map()
   }
 
+  state(url) {
+    if (!url.startsWith('itmpws://')) {
+      console.error('state unknown schema', url)
+      throw new Error('unknown schema')
+    }
+    const parts = this.splitUrl(url)
+    try {
+      return this.intstates.get(parts[0]) || 'init'
+    } catch (e) {
+      return undefined
+    }
+
+  }
   getter(url) {
     try {
       return this.states.get(url)
@@ -34,11 +48,16 @@ class Core {
         reconnectTimeout: 3000,
         autoReconnect: true,
         reconnectMaxCount: 0,
-        onOpen: () => { },
-        onClose: () => { },
+        onOpen: () => {
+          this.intstates.set(hostport, 'online')
+        },
+        onClose: () => {
+          this.intstates.set(hostport, 'offline')
+        },
         onError: () => { },
         onReconnect: () => { }
       })
+      this.intstates.set(hostport, 'trying')
       itmp.connect()
       this.connections.set(hostport, itmp)
     }
