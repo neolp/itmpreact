@@ -65,6 +65,23 @@ class Core {
     return itmp
   }
 
+  getvalue(url, opts) {
+    if (!url.startsWith('itmpws://')) {
+      console.error('subscribe unknown schema', url)
+      throw new Error('unknown schema')
+    }
+    const parts = this.splitUrl(url)
+    let itmp = this.connect(parts[0])
+    this.states.set(url, undefined)
+    console.log('subscribe', url, '=', parts[0], '->', parts[1])
+
+    return itmp.call(parts[1], undefined).then((value) => {
+      console.log('got', url, value)
+      this.states.set(url, value)
+      return value
+    })
+  }
+
   subscribe(url, opts) {
     if (!url.startsWith('itmpws://')) {
       console.error('subscribe unknown schema', url)
