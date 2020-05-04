@@ -10,6 +10,11 @@
     "type": "git",
     "url": "git+https://github.com/neolp/itmpreact.git"
   },
+  "keywords": [
+    "itmp",
+    "iot",
+    "ws"
+  ],
   "author": "Alexei Tsigulin",
   "license": "MIT",
   "bugs": {
@@ -17,7 +22,7 @@
   },
   "homepage": "https://github.com/neolp/itmpreact#readme",
   "dependencies": {
-    "itmpws": "^1.2.2",
-    "mobx": "^5.15.0"
+    "itmpws": "^1.3.2",
+    "mobx": "^5.15.4"
   }
 }

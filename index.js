@@ -7,6 +7,7 @@ class Core {
     this.connections = new Map()
     this.states = observable.map()
     this.intstates = observable.map()
+    //    this.states.set('@state', 0)
   }
 
   state(url) {
@@ -22,6 +23,7 @@ class Core {
     }
 
   }
+
   getter(url) {
     try {
       return this.states.get(url)
@@ -82,7 +84,7 @@ class Core {
     })
   }
 
-  subscribe(url, opts) {
+  subscribe(url, opts, cb) {
     if (!url.startsWith('itmpws://')) {
       console.error('subscribe unknown schema', url)
       throw new Error('unknown schema')
@@ -94,6 +96,7 @@ class Core {
 
     return itmp.subscribeOnce(parts[1], (exttopic, value) => {
       this.states.set(url, value)
+      if (cb) cb(value, url)
     }, opts).then((res) => {
       console.log('subscribed')
     })
